@@ -1,0 +1,12 @@
+[project]
+name = "custom-python-data-structures"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ipython>=8.31.0",
+    "pytest>=8.3.4",
+    "ruff>=0.9.2",
+    "wat>=0.5.0",
+]
