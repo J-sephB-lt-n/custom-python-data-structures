@@ -36,6 +36,9 @@ class XiList(list):
     def __contains__(self, key) -> bool: 
         return self._data.__contains__(key)
 
+    def __delattr__(self, name):
+        raise TypeError(self.reject_modify_attempt_error_message)
+
     def __getitem__(self, index_or_slice):
         return self._data.__getitem__(index_or_slice)
 
@@ -78,6 +81,9 @@ class XiDict(dict):
 
     def __contains__(self, key) -> bool: 
         return self._data.__contains__(key)
+
+    def __delattr__(self, name):
+        raise TypeError(self.reject_modify_attempt_error_message)
 
     # def __getitem__(self, key):
     #     """Allows access to items using the key."""
