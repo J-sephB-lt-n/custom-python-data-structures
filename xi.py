@@ -2,11 +2,11 @@
 Definitions of extensible but otherwise immutable data structures
 """
 
-from typing import Any, Iterable
+from typing import Any, Iterable, SupportsIndex
 
 def xi(x: Any) -> Any:
     """
-    TODO
+Make list or dict eXtensible but otherwise Immutable (XI)
     """
     if isinstance(x, list):
         return XiList(x)
@@ -54,6 +54,17 @@ class XiList(list):
     #         return self._data == list(other)
     #     return False
 
+    def clear(self): 
+        raise TypeError(self.reject_modify_attempt_error_message)
+
+    def insert(self, index, object):
+        raise TypeError(self.reject_modify_attempt_error_message)
+
+    def pop(self, index: SupportsIndex=-1):
+        raise TypeError(self.reject_modify_attempt_error_message)
+
+    def remove(self, value):
+        raise TypeError(self.reject_modify_attempt_error_message)
 
 class XiDict(dict):
     """Extensible but otherwise immutable dict"""
@@ -61,6 +72,9 @@ class XiDict(dict):
     def __init__(self, dict_: dict) -> None:
         self._data = {key: xi(value) for key, value in dict_.items()}
         self.reject_modify_attempt_error_message: str = "XiDict (eXtensible but otherwise immutable Dict) can be extended but not modified"
+
+    def __contains__(self, key) -> bool: 
+        return self._data.__contains__(key)
 
     # def __getitem__(self, key):
     #     """Allows access to items using the key."""
