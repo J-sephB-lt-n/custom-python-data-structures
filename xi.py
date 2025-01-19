@@ -33,6 +33,9 @@ class XiList(list):
                 f"Can only concatenate XiList or iterable, not {type(other).__name__}"
             )
 
+    def __contains__(self, key) -> bool: 
+        return self._data.__contains__(key)
+
     def __getitem__(self, index_or_slice):
         return self._data.__getitem__(index_or_slice)
 
