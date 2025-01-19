@@ -11,11 +11,16 @@ def test_xi_list():
     assert isinstance(x, list)
     assert x + [1, 2, 3] == xi(mutable_list + [1, 2, 3])
     assert len(x) == len(mutable_list)
-    # x.clear()
-    # x.insert(index=69, object="test")
-    # x.pop()
-    # x.pop(2)
-    # x.remove(4)
+    for method_name, args in (
+        ("clear", tuple()),
+        ("insert", (1, "test")),
+        ("pop", tuple()),
+        ("pop", (2,)),
+        ("remove", (4,)),
+    ):
+        with pytest.raises(TypeError) as raises_data:
+            getattr(x, method_name)(*args)
+        assert str(raises_data.value) == x.reject_modify_attempt_error_message
     json.dumps(x, indent=4)
     
 
@@ -44,4 +49,7 @@ def test_xi_dict():
     assert isinstance(x.a_nested_thing[0].an, XiDict)
     assert x.a_list[1] == 2
     assert x.a_dict.my_name_part2 == "oe"
-
+    assert "a_number" in x
+    assert "does not exist" not in x
+    assert "data" in x.a_nested_thing[0].an.meta
+    assert 80085 not in x.a_nested_thing[1]
