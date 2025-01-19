@@ -22,7 +22,8 @@ def test_xi_list():
             getattr(x, method_name)(*args)
         assert str(raises_data.value) == x.reject_modify_attempt_error_message
     json.dumps(x, indent=4)
-    
+    assert 1 in x 
+    assert 4 in x[2]
 
 def test_xi_dict(): 
     mutable_dict: dict = {
