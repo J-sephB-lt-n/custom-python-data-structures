@@ -2,11 +2,13 @@
 Definitions of extensible but otherwise immutable data structures
 """
 
+import warnings
 from typing import Any, Iterable, SupportsIndex
+
 
 def xi(x: Any) -> Any:
     """
-Make list or dict eXtensible but otherwise Immutable (XI)
+    Make list or dict eXtensible but otherwise Immutable (XI)
     """
     if isinstance(x, list):
         return XiList(x)
@@ -21,6 +23,19 @@ class XiList(list):
     def __init__(self, iterable: Iterable) -> None:
         self._data = [xi(x) for x in iterable]
         self.reject_modify_attempt_error_message: str = "XiList (eXtensible but otherwise immutable List) can be extended but not modified"
+        
+        new_attr_names: set[str] = set(dir(list)).difference(builtin_list_attribute_names)
+        if len(new_attr_names) > 0:
+            warnings.warn(
+                message=(
+                    "The following attributes of builtin `list` were not present at time of "
+                        "development of XiList, and may compromise immutability and/or extensibility: "
+                        f"{new_attr_names}"
+                ),
+                category=FutureWarning,
+                stacklevel=2,
+            )
+            
 
     def __add__(self, other):
         """Enables use of `+` with XiList, ensuring the result is also a XiList"""
@@ -33,7 +48,7 @@ class XiList(list):
                 f"Can only concatenate XiList or iterable, not {type(other).__name__}"
             )
 
-    def __contains__(self, key) -> bool: 
+    def __contains__(self, key) -> bool:
         return self._data.__contains__(key)
 
     def __delattr__(self, name):
@@ -60,17 +75,18 @@ class XiList(list):
     #         return self._data == list(other)
     #     return False
 
-    def clear(self): 
+    def clear(self):
         raise TypeError(self.reject_modify_attempt_error_message)
 
     def insert(self, index, object):
         raise TypeError(self.reject_modify_attempt_error_message)
 
-    def pop(self, index: SupportsIndex=-1):
+    def pop(self, index: SupportsIndex = -1):
         raise TypeError(self.reject_modify_attempt_error_message)
 
     def remove(self, value):
         raise TypeError(self.reject_modify_attempt_error_message)
+
 
 class XiDict(dict):
     """Extensible but otherwise immutable dict"""
@@ -79,7 +95,19 @@ class XiDict(dict):
         self._data = {key: xi(value) for key, value in dict_.items()}
         self.reject_modify_attempt_error_message: str = "XiDict (eXtensible but otherwise immutable Dict) can be extended but not modified"
 
-    def __contains__(self, key) -> bool: 
+        new_attr_names: set[str] = set(dir(dict)).difference(builtin_dict_attribute_names)
+        if len(new_attr_names) > 0:
+            warnings.warn(
+                message=(
+                    "The following attributes of builtin `dict` were not present at time of "
+                        "development of XiDict, and may compromise immutability and/or extensibility: "
+                        f"{new_attr_names}"
+                ),
+                category=FutureWarning,
+                stacklevel=2,
+            )
+
+    def __contains__(self, key) -> bool:
         return self._data.__contains__(key)
 
     def __delattr__(self, name):
@@ -130,3 +158,106 @@ class XiDict(dict):
     # def get(self, key, default=None):
     #     """Returns the value for a key, or a default value if the key is not found."""
     #     return self._data.get(key, default)
+
+
+builtin_list_attribute_names: set[str] = {
+    # generated this list using dir(list) in python 3.13.1
+    "__add__",
+    "__class__",
+    "__class_getitem__",
+    "__contains__",
+    "__delattr__",
+    "__delitem__",
+    "__dir__",
+    "__doc__",
+    "__eq__",
+    "__format__",
+    "__ge__",
+    "__getattribute__",
+    "__getitem__",
+    "__getstate__",
+    "__gt__",
+    "__hash__",
+    "__iadd__",
+    "__imul__",
+    "__init__",
+    "__init_subclass__",
+    "__iter__",
+    "__le__",
+    "__len__",
+    "__lt__",
+    "__mul__",
+    "__ne__",
+    "__new__",
+    "__reduce__",
+    "__reduce_ex__",
+    "__repr__",
+    "__reversed__",
+    "__rmul__",
+    "__setattr__",
+    "__setitem__",
+    "__sizeof__",
+    "__str__",
+    "__subclasshook__",
+    "append",
+    "clear",
+    "copy",
+    "count",
+    "extend",
+    "index",
+    "insert",
+    "pop",
+    "remove",
+    "reverse",
+    "sort",
+}
+
+builtin_dict_attribute_names: set[str] = {
+    # generated this list using dir(dict) in python 3.13.1
+    "__class__",
+    "__class_getitem__",
+    "__contains__",
+    "__delattr__",
+    "__delitem__",
+    "__dir__",
+    "__doc__",
+    "__eq__",
+    "__format__",
+    "__ge__",
+    "__getattribute__",
+    "__getitem__",
+    "__getstate__",
+    "__gt__",
+    "__hash__",
+    "__init__",
+    "__init_subclass__",
+    "__ior__",
+    "__iter__",
+    "__le__",
+    "__len__",
+    "__lt__",
+    "__ne__",
+    "__new__",
+    "__or__",
+    "__reduce__",
+    "__reduce_ex__",
+    "__repr__",
+    "__reversed__",
+    "__ror__",
+    "__setattr__",
+    "__setitem__",
+    "__sizeof__",
+    "__str__",
+    "__subclasshook__",
+    "clear",
+    "copy",
+    "fromkeys",
+    "get",
+    "items",
+    "keys",
+    "pop",
+    "popitem",
+    "setdefault",
+    "update",
+    "values",
+}
