@@ -1,4 +1,7 @@
-import json
+"""
+Definitions of extensible but otherwise immutable data structures
+"""
+
 from typing import Any, Iterable
 
 def xi(x: Any) -> Any:
@@ -6,19 +9,18 @@ def xi(x: Any) -> Any:
     TODO
     """
     if isinstance(x, list):
-        """this should be recursive"""
         return XiList(x)
     if isinstance(x, dict):
-        """this should be recursive"""
         return XiDict(x)
     return x
+
 
 class XiList(list):
     """Extensible but otherwise immutable list"""
 
     def __init__(self, iterable: Iterable) -> None:
         self._data = [xi(x) for x in iterable]
-        self.reject_modify_attempt_error_message: str = "XiLis (eXtensible but otherwise immutable List) can be extended but not modified"
+        self.reject_modify_attempt_error_message: str = "XiList (eXtensible but otherwise immutable List) can be extended but not modified"
 
     def __add__(self, other):
         """Enables use of `+` with XiList, ensuring the result is also a XiList"""
@@ -31,16 +33,13 @@ class XiList(list):
                 f"Can only concatenate XiList or iterable, not {type(other).__name__}"
             )
 
-    def __getitem__(self, index):
-        """Enables indexing and slicing."""
-        return self._data.__getitem__(index)
+    def __getitem__(self, index_or_slice):
+        return self._data.__getitem__(index_or_slice)
 
     def __len__(self):
-        """Returns the length of the list."""
         return len(self._data)
 
     def __repr__(self):
-        """Provides a string representation of the XiList."""
         return f"xi{self._data}"
 
     # def __iter__(self):
@@ -56,11 +55,12 @@ class XiList(list):
     #     return False
 
 
-class XiDict:
+class XiDict(dict):
     """Extensible but otherwise immutable dict"""
 
     def __init__(self, dict_: dict) -> None:
-        self._data = dict(dict_)
+        self._data = {key: xi(value) for key, value in dict_.items()}
+        self.reject_modify_attempt_error_message: str = "XiDict (eXtensible but otherwise immutable Dict) can be extended but not modified"
 
     # def __getitem__(self, key):
     #     """Allows access to items using the key."""
@@ -77,11 +77,14 @@ class XiDict:
     # def __contains__(self, key):
     #     """Checks if a key is in the dictionary."""
     #     return key in self._data
-    #
-    # def __repr__(self):
-    #     """Provides a string representation of the XiDict."""
-    #     return f"XiDict({self._data})"
-    #
+
+    def __getattr__(self, name):
+        return self._data[name]
+
+    def __repr__(self):
+        """Provides a string representation of the XiDict."""
+        return f"xi{self._data}"
+
     # def __eq__(self, other):
     #     """Checks equality between XiDict and other dictionaries."""
     #     if isinstance(other, XiDict):
@@ -105,21 +108,3 @@ class XiDict:
     # def get(self, key, default=None):
     #     """Returns the value for a key, or a default value if the key is not found."""
     #     return self._data.get(key, default)
-
-
-
-
-if __name__ == "__main__":
-    mutable_list: list = [1, 2, [3, 4], 5]
-    x = xi(mutable_list)
-    assert isinstance(x, XiList)
-    assert isinstance(x, list)
-    assert x + [1,2,3] == xi(mutable_list + [1,2,3])
-    assert len(x) == len(mutable_list)
-    json.dumps(x)
-    x.clear()
-    x.insert(index=69, object="test")
-    x.pop()
-    x.pop(2)
-    x.remove(4)
-    json.dumps(x, indent=4)
