@@ -4,7 +4,8 @@ import pytest
 
 from xi import xi, XiDict, XiList
 
-def test_xi_list(): 
+
+def test_xi_list():
     mutable_list: list = [1, 2, [3, 4], 5]
     x = xi(mutable_list)
     assert isinstance(x, XiList)
@@ -22,10 +23,11 @@ def test_xi_list():
             getattr(x, method_name)(*args)
         assert str(raises_data.value) == x.reject_modify_attempt_error_message
     json.dumps(x, indent=4)
-    assert 1 in x 
+    assert 1 in x
     assert 4 in x[2]
 
-def test_xi_dict(): 
+
+def test_xi_dict():
     mutable_dict: dict = {
         "a_string": "hello",
         "a_number": 69,
@@ -45,12 +47,21 @@ def test_xi_dict():
         ],
     }
     x = xi(mutable_dict)
-    assert isinstance(x, XiDict) 
+    assert isinstance(x, XiDict)
     assert isinstance(x, dict)
     assert isinstance(x.a_nested_thing[0].an, XiDict)
+    assert x.a_string == "hello"
+    assert x["a_string"] == "hello"
     assert x.a_list[1] == 2
+    assert x["a_list"][1] == 2
     assert x.a_dict.my_name_part2 == "oe"
     assert "a_number" in x
     assert "does not exist" not in x
     assert "data" in x.a_nested_thing[0].an.meta
     assert 80085 not in x.a_nested_thing[1]
+    with pytest.raises(TypeError) as raises_data:
+        del x.a_string
+    assert str(raises_data.value) == x.reject_modify_attempt_error_message
+    # with pytest.raises(TypeError) as raises_data:
+    #     del x["a_string"]
+    # assert str(raises_data.value) == x.reject_modify_attempt_error_message
