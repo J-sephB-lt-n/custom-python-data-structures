@@ -85,10 +85,9 @@ class XiDict(dict):
     def __delattr__(self, name):
         raise TypeError(self.reject_modify_attempt_error_message)
 
-    # def __getitem__(self, key):
-    #     """Allows access to items using the key."""
-    #     return self._data[key]
-    #
+    def __getitem__(self, key):
+        return self._data[key]
+
     # def __len__(self):
     #     """Returns the number of key-value pairs in the dictionary."""
     #     return len(self._data)
